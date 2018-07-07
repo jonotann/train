@@ -1,0 +1,22 @@
+.jumbotron {
+    background-image: url("https://images.pexels.com/photos/507410/pexels-photo-507410.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940");
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-attachment: inherit;
+    background-position: 75% 25%;
+}
+#border {
+    background-color: white;
+    opacity: .70;
+    font-weight: bold;
+}
+#border2 {
+    background-color: black;
+    opacity: .70;
+    font-weight: bold; 
+}
+#border3 {
+    background-color: black;
+    opacity: .70;
+    font-weight: bold; 
+}
