@@ -65,6 +65,7 @@ $(document).ready(function () {
         });
 
     });
+    
     dataRef.ref().on("child_added", function (snapshot) {
         var newPost = snapshot.val();
 
