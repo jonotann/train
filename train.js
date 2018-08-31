@@ -13,58 +13,70 @@ $(document).ready(function () {
     };
     firebase.initializeApp(config);
 
-    //..
-
-    var database = firebase.database();
-
-    var name = "";
-    var destination = "";
-    var firstTrain = "";
-    var frequency = 0;
-
-    var timeStart = $("#start-date").val();
-
-    var minFormat = moment(timeStart, "hh:mm").subtract(1, "years");
-    var currentTime = moment();
-    var timeToArrival = moment().diff(moment(minFormat), "minutes");
-    var timeRemaining = timeToArrival % frequency;
-    var minAway = frequency - timeRemaining;
-
-    var nextTrain = moment().add(minAway, "minutes");
-    var nextTrainFromat = moment(nextTrain).format("hh:mm");
-
-
-    $("#addTrain").on("click", function (event) {
+    //creating my variable to refrence my database
+    var dataRef = firebase.database();
+    //creating a onclick function for our submit
+    $("#submit-btn").on("click", function (event) {
         event.preventDefault();
+        //Our variables that refrence our users input
+        var trainName = $("#name").val().trim();
+        var destination = $("#destination").val().trim();
+        var timeStart = $("#start-date").val().trim();
+        var frequency = $("#rate").val().trim();
+        // coversions
+        var minutesFormat = moment(timeStart, "hh:mm").subtract(1, "years");
+        currentTime = moment();
+        var timeToarrival = moment().diff(moment(minutesFormat), "minutes");
+        var tRemainder = timeToarrival % frequency;
+        var minutesAway = frequency - tRemainder;
+        // Next Train
+        var nextTrain = moment().add(minutesAway, "minutes");
+        var nextTrainFormat = moment(nextTrain).format("hh:mm");
+        //creating tables variables to then refrence them after and append
+        var rowAdd = $('<tr>');
+        var namehead = $('<td>');
+        namehead.html(trainName);
 
-        name = $("#name").val().trim();
-        destination = $("#dest").val().trim();
-        firstTrain = $("#firstTrain").val().trim();
-        frequency = $("#frequency").val().trim();
+        var destinationData = $('<td>');
+        destinationData.html(destination);
 
-        database.ref().push({
-            name: name,
-            destination: destination,
-            firstTrain: firstTrain,
+        var timeData = $('<td>');
+        timeData.html(frequency);
+
+
+        var frequencyData = $('<td>');
+        frequencyData.html(nextTrainFormat);
+
+        var MinutesAwayData = $('<td>');
+        MinutesAwayData.html(minutesAway);
+
+
+        $('tbody').append(rowAdd);
+
+        dataRef.ref().push({
+            name: trainName,
+            dest: destination,
+            time: nextTrainFormat,
             frequency: frequency,
-            dataAdded: firebase.database.ServerValue.TIMESTAMP
+            ETA: minutesAway,
+
+            dateAdded: firebase.database.ServerValue.TIMESTAMP
 
         });
 
     });
+    dataRef.ref().on("child_added", function (snapshot) {
+        var newPost = snapshot.val();
 
-    database.ref().on("child_added", function (childSnapshot) {
+        console.log("Name: " + newPost.name);
+        console.log("destination: " + newPost.dest);
+        console.log("time: " + newPost.time);
+        console.log("frequency:" + newPost.freq);
+        console.log("Minutes Away:" + newPost.ETA);
 
-        console.log("Name: " + childSnapshot.val().name);
-        console.log("Destination: " + childSnapshot.val().destination);
-        console.log("Time: " + childSnapshot.val().timeRemaining);
-        console.log("Frequency: " + childSnapshot.val().frequency);
-        console.log("Minutes Away: " + childSnapshot.val().firstTrain);
-
-        $("#tbody").append("<tr><td><span class='train-name'</td></tr>" + childSnapshot.val().name +
-            " <tr><td><span class='train-destination'</td></tr> " + childSnapshot.val().destination +
-            "<tr><td><span class='train-original'</td></tr>" + childSnapshot.val().firstTrain +
-            "<tr><td><span class='train-frequency'</td></tr>" + childSnapshot.val().frequency + "")
+        // append the values stored in database to the table body
+        $(".table > tbody").append("<tr><td>" + newPost.name + "</td><td>" + newPost.dest + "</td><td>" + newPost.frequency + "</td><td>" + newPost.time + "</td><td>" + newPost.ETA + "</td></tr>");
     });
+
 
 });
